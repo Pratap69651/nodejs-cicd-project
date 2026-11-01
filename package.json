@@ -1,0 +1,11 @@
+{
+  "name": "nodejs-cicd-project",
+  "version": "1.0.0",
+  "description": "Jenkins CI/CD practical",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "test": "node test.js",
+    "build": "echo 'Application build completed'"
+  }
+}
