@@ -2,6 +2,10 @@
 pipeline {
     agent any
 
+    tools {
+        nodejs 'NodeJS-16'
+    }
+
     options {
         timestamps()
         ansiColor('xterm')
@@ -50,7 +54,21 @@ pipeline {
             }
         }
 
-        stage('06 - Archive Artifacts') {
+        stage('06 - SonarQube Analysis') {
+            steps {
+                script {
+                    def scannerHome = tool 'SonarScanner'
+
+                    withSonarQubeEnv('SonarQube') {
+                        sh """
+                            ${scannerHome}/bin/sonar-scanner
+                        """
+                    }
+                }
+            }
+        }
+
+        stage('07 - Archive Artifacts') {
             steps {
                 echo 'Archiving application files'
                 archiveArtifacts artifacts: 'app.js, package.json',
