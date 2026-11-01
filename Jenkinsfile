@@ -1,41 +1,75 @@
+
 pipeline {
     agent any
 
+    options {
+        timestamps()
+        ansiColor('xterm')
+        disableConcurrentBuilds()
+        buildDiscarder(logRotator(
+            numToKeepStr: '10'
+        ))
+    }
+
     stages {
 
-        stage('Checkout') {
+        stage('01 - Checkout') {
             steps {
-                echo 'Checking out source code'
+                echo '\033[34mChecking out source code...\033[0m'
                 checkout scm
             }
         }
 
-        stage('Install Dependencies') {
+        stage('02 - Environment') {
             steps {
+                echo 'Checking environment'
+                sh 'node --version'
+                sh 'npm --version'
+                sh 'git --version'
+            }
+        }
+
+        stage('03 - Install Dependencies') {
+            steps {
+                echo 'Installing Node.js dependencies'
                 sh 'npm install'
             }
         }
 
-        stage('Test') {
+        stage('04 - Unit Testing') {
             steps {
+                echo 'Running unit tests'
                 sh 'npm test'
             }
         }
 
-        stage('Build') {
+        stage('05 - Build Application') {
             steps {
+                echo 'Building application'
                 sh 'npm run build'
+            }
+        }
+
+        stage('06 - Archive Artifacts') {
+            steps {
+                echo 'Archiving application files'
+                archiveArtifacts artifacts: 'app.js, package.json',
+                                 fingerprint: true
             }
         }
     }
 
     post {
         success {
-            echo 'CI Pipeline completed successfully!'
+            echo '\033[32mCI PIPELINE SUCCESSFUL!\033[0m'
         }
 
         failure {
-            echo 'CI Pipeline failed. Check logs.'
+            echo '\033[31mCI PIPELINE FAILED!\033[0m'
+        }
+
+        always {
+            echo 'Pipeline execution completed'
         }
     }
 }
