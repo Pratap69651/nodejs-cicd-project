@@ -67,8 +67,14 @@ pipeline {
                 }
             }
         }
-
-        stage('07 - Archive Artifacts') {
+        stage('07 - Quality Gate') {
+    steps {
+        timeout(time: 5, unit: 'MINUTES') {
+            waitForQualityGate abortPipeline: true
+        }
+    }
+}
+        stage('08 - Archive Artifacts') {
             steps {
                 echo 'Archiving application files'
                 archiveArtifacts artifacts: 'app.js, package.json',
